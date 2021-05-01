@@ -50,3 +50,42 @@ $ hexdump -C BOOTX64.EFI
 $ sum BOOTX64.EFI
 12430     2
 ```
+
+作った謎ファイルを使ってイメージファイルを作る。
+
+```shell
+$ qemu-img create -f raw disk.img 200M
+Formatting 'disk.img', fmt=raw size=209715200
+$ mkfs.fat -n 'MIKAN OS' -s 2 -f 2 -R 32 -F 32 disk.img
+mkfs.fat 4.1 (2017-01-24)
+$ mkdir -p mnt
+$ sudo mount -o loop disk.img mnt
+$ sudo mkdir -p mnt/EFI/BOOT
+$ sudo cp BOOTX64.EFI mnt/EFI/BOOT/BOOTX64.EFI
+```
+
+WSLで必要なファイルを取ってくる。
+
+```shell
+$ git clone https://github.com/uchan-nos/mikanos-build.git osbook
+```
+
+VcXsrvを起動しておく。
+ウィンドウを出すには、WSLのIPアドレスがXXX.YYY.ZZZ.AAAとすると、
+
+```shell
+$ export DISPLAY=XXX.YYY.ZZZ.AAA:0.0
+```
+と設定しておく。
+
+```shell
+$ qemu-system-x86_64 \
+  -drive if=pflash,file=/mnt/e/work_dir/os/osbook/devenv/OVMF_CODE.fd \
+  -drive if=pflash,file=/mnt/e/work_dir/os/osbook/devenv/OVMF_VARS.fd \
+  -hda disk.img
+```
+
+なんかでた。
+
+![qemuのウィンドウ](img/2021-05-02-00-10-32.png)
+
