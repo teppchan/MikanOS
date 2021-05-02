@@ -4,6 +4,11 @@
 
 WSLのUbuntu 18.04で作業。
 
+開発環境は以下の通り。
+- Windows10
+- Ubuntu 18.04 on WSL2
+- Visual Studio Code
+
 ```bash
 $ sudo apt update && sudo apt upgrade
 $ sudo apt install qemu
@@ -89,3 +94,67 @@ $ qemu-system-x86_64 \
 
 ![qemuのウィンドウ](img/2021-05-02-00-10-32.png)
 
+## 2021/05/02 （2日目）
+
+p.43の`hello.c`を準備。
+
+開発環境が入っていなかったのでインストール。
+
+```sh
+$ sudo apt install build-essential
+$ sudo apt install clang lld
+```
+
+`Makefile`を準備していざコンパイルしようとしたけど、やっぱりエラーが出た。
+`EFI_STATUS`の定義がないから変だと思ってた。開発環境に入ってた`hello.c`を見たら、いろいろ定義が入ってた。
+確かに本文を読むと、`EfiMain`だけ取り出して説明していることになってた。
+
+```cpp:hello.c
+typedef unsigned short CHAR16;
+typedef unsigned long long EFI_STATUS;
+typedef void *EFI_HANDLE;
+
+struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+typedef EFI_STATUS (*EFI_TEXT_STRING)(
+  struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
+  CHAR16                                   *String);
+
+typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
+  void             *dummy;
+  EFI_TEXT_STRING  OutputString;
+} EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+
+typedef struct {
+  char                             dummy[52];
+  EFI_HANDLE                       ConsoleOutHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *ConOut;
+} EFI_SYSTEM_TABLE;
+
+EFI_STATUS EfiMain(EFI_HANDLE        ImageHandle,
+                   EFI_SYSTEM_TABLE  *SystemTable) {
+  SystemTable->ConOut->OutputString(SystemTable->ConOut, L"Hello, world!\n");
+  while (1);
+  return 0;
+}
+```
+
+昨日はNTFSで作ったディレクトリ`mnt`をマウントポイントに設定できてたのに、今日はできない。
+昨日はWSL2の環境で動かしてたのに対し、いまWSL1の環境で作業してる。これが原因？
+
+`osbook/devenv/run_emu.sh` を使って実行してもうまくいかなかった。
+
+WSL2に変更した
+
+```shell
+> wsl --set-version Ubuntu-18.04 2
+```
+
+```sh
+$ cd day01
+$ make hello.efi
+$ ./run_hello.sh
+```
+
+![hello.efiで起動したQEMU](img/2021-05-02-14-49-02.png)
+
+でた！
