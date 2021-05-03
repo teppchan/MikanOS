@@ -158,3 +158,138 @@ $ ./run_hello.sh
 ![hello.efiで起動したQEMU](img/2021-05-02-14-49-02.png)
 
 でた！
+
+## 2021/05/03 （3日目）
+
+開発環境をセットしきってなかった。
+`https://github.com/uchan-nos/mikanos-build.git` の `devenv/ansible-provision.yml` にセットアップ方法がまとまってた。`ansible`を使う手順が書いてあったけど、中身を見て自分で打ち込んでみる。
+
+```sh
+$ sudo apt install build-essential llvm-7-dev lld-7 clang-7 nasm acpica-tools u
+uid-dev qemu-system-x86 qemu-utils xauth unzip python3-distutils
+$ cd osbook/devenv
+$ git clone https://github.com/tianocore/edk2.git
+$ cd edk2
+$ git checkout -b 38c8be123aced4cc8ad5c7e0da9121a181b94251
+$ cd ..
+$ wget https://github.com/uchan-nos/mikanos-build/releases/download/v2.0/x86_64-elf.tar.gz
+$ tar xf x86_64-elf.tar.gz
+```
+
+`clang-7`という感じでバージョン番号がついているファイルを、ついてないファイルにシンボリックしなおしていたので、`day02/rename_ln.sh`で対処した。
+
+```sh
+$ sudo day02/rename_ln.sh
+```
+
+これで開発環境ができた。
+
+あとこれを、`.profile`に追加しておくと、Xウィンドウが出てくるようになる。
+```
+export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
+```
+
+2日目のデータ（`osbook_day02a`）を取り出すために、`Mikan OS`のリポジトリを取ってくる。
+
+```sh
+$ git clone https://github.com/uchan-nos/mikanos.git
+```
+
+```sh
+$ cd mikanos
+$ git checkout -b osbook_day02a
+```
+
+せっかくなので写経してみる。。。
+
+`PACKAGE_GUID`は自分で作ったのを使ってみる。`uuidgen`というのが使えた。
+
+```sh
+$ uuidgen
+dbe19b51-65ba-4b01-a8cd-b194af164088
+```
+
+写経したのでコンパイルしてみる。
+さっきダウンロードした`edk2`の環境に、写経したファイルの入っているディレクトリのシンボリックリンクを作る。
+
+```sh
+$ cd osbllk/devenv/edk2
+$ ln -s ../../../day02/MikanLoaderPkg .
+```
+
+開発環境にある`edksetup.sh`を読み込む。`conf`の下にファイルができる。
+```sh
+$ source edksetup.sh
+$ ls Conf
+BuildEnv.sh  ReadMe.txt  build_rule.txt  target.txt  tools_def.txt
+```
+
+`Conf/target.txt`を編集する。変更する箇所は下記の4か所。
+
+- ACITVE_PLATFORM = MikanLoaderPkg/MikanLoaderPkg.sdc
+- TARGET = DEBUG
+- TARGET_ARCH = X64
+- TOOL_CHAIN_TAG = CLANG38
+
+ビルドする。
+
+```sh
+$ pwd
+.../osbook/devenv/edk2
+$ build
+```
+
+写経のTypoを直したりしたら、こんなエラーがでた。
+
+```
+BaseTools C Tool binary was not found (GenFw)
+You may need to run:
+  make -C xxxxx/BaseTools/Source/C
+```
+
+いう通りrunしてみたら、
+```
+BrotliCompress.c:20:10: fatal error: ./brotli/c/common/constants.h: No such file or directory
+ #include "./brotli/c/common/constants.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+../Makefiles/footer.makefile:21: recipe for target 'BrotliCompress.o' failed
+make[1]: *** [BrotliCompress.o] Error 1
+```
+
+というエラーになった。
+`ansible_provision.yml`を見直したら、いくつか手順を抜かしてた。
+
+- `git clone`するとき`--recursive`を付けてなかった
+  - `git submodule update --init --recursive` で対処
+- ツールのコンパイル
+  - `cd edk2/BaseTools/Source/C; make`
+
+分からなくなるので環境の構築手順をまとめなおす。
+すなおに`ansible`使えばよかった、、、
+
+```sh
+$ sudo apt install build-essential llvm-7-dev lld-7 clang-7 nasm acpica-tools u
+uid-dev qemu-system-x86 qemu-utils xauth unzip python3-distutils
+$ sudo day02/rename_ln.sh
+$ cd osbook/devenv
+$ git clone --recursive https://github.com/tianocore/edk2.git
+$ cd edk2
+$ git checkout -b 38c8be123aced4cc8ad5c7e0da9121a181b94251
+$ cd BaseTools/Source/C
+$ make
+$ cd -
+$ cd ..
+$ wget https://github.com/uchan-nos/mikanos-build/releases/download/v2.0/x86_64-elf.tar.gz
+$ tar xf x86_64-elf.tar.gz
+```
+
+`build`しなおしたらBUILDに成功した。
+
+```sh
+$ ../run_qemu.sh Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi
+```
+
+![EDK2環境でビルドしたLoader.efi](img/2021-05-03-13-48-27.png)
+
+でた。
