@@ -293,3 +293,20 @@ $ ../run_qemu.sh Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi
 ![EDK2環境でビルドしたLoader.efi](img/2021-05-03-13-48-27.png)
 
 でた。
+
+## 2021/05/04 （４日目）
+
+`osbook_day02b`の`Main.c`を写経する。
+
+`build`してQEMUを起動した。
+
+![osbook_day02b](img/2021-05-04-16-38-00.png)
+
+```sh
+$ sudo mount -o loop disk.img mnt
+$ cat mnt/memmap
+Index, Type, Type(name), PhysicalStart, NumberOfPages, Attribute
+@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>@dw>
+```
+
+なんか出たけど、化けてる。。。
