@@ -531,3 +531,30 @@ extern "C" void KernelMain() {
     while (1) __asm__("hlt");
 }
 ```
+
+## 2021/05/07 （7日目）
+
+今日は3.4節から。
+
+`Main.c`に`OpenGOP`、`GetPixelFormatUnicode`の関数を追加、`UefiMain`に`gop`を使う命令を追加した。
+
+```sh
+$ cd day03b
+$ cd kernel; make; cd ..
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+でた！
+
+![GOP](img/2021-05-07-21-50-00.png)
+
+白く塗りつぶしてしまって、画面の解像度情報とかが見えなくなってるので、塗りつぶさないようにしてみた。
+
+![GOP 白く塗りつぶさない](img/2021-05-07-21-53-00.png)
+
+- 解像度は800x600 （1行に800画素）
+- BGR
+- フレームバッファは0x80000000～0x801D5000で、サイズは1,921,024バイト
+  - 800x600x4バイト=1,920,000バイト
+  - 1ページ4096バイト単位だから切り上げて、1,921,024 (=int((1,920,000+0xFFF)/0x1000)*0x1000)
