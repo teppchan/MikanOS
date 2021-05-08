@@ -558,3 +558,48 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 - フレームバッファは0x80000000～0x801D5000で、サイズは1,921,024バイト
   - 800x600x4バイト=1,920,000バイト
   - 1ページ4096バイト単位だから切り上げて、1,921,024 (=int((1,920,000+0xFFF)/0x1000)*0x1000)
+
+## 2021/05/08 （8日目）
+
+今日は`osbook_day03c`のところ。
+
+`kernel/main.cpp`を改造する。
+
+```sh
+$ cd day03c
+$ source ../../osbook/devenv/buildenv.sh
+```
+
+`source`している`buildenv.sh`の中身を一応見ておくと、`CPPFLAGS`と`LDFLAGS`が環境変数として宣言されていた。
+
+```sh
+$ cat ../../osbook/devenv/buildenv.sh 
+# Usage: source buildenv.sh
+
+BASEDIR="$HOME/osbook/devenv/x86_64-elf"
+EDK2DIR="$HOME/edk2"
+export CPPFLAGS="\
+-I$BASEDIR/include/c++/v1 -I$BASEDIR/include -I$BASEDIR/include/freetype2 \
+-I$EDK2DIR/MdePkg/Include -I$EDK2DIR/MdePkg/Include/X64 \
+-nostdlibinc -D__ELF__ -D_LDBL_EQ_DBL -D_GNU_SOURCE -D_POSIX_TIMERS \
+-DEFIAPI='__attribute__((ms_abi))'"
+export LDFLAGS="-L$BASEDIR/lib"
+```
+
+この環境変数を使うように`Makefile`を書き換えておく。
+
+```Makefile
+all: main.cpp
+	clang++ $(CPPFLAGS) -O2 -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -std=c++17 -c main.cpp
+	ld.lld $(LDFLAGS) --entry KernelMain -z norelro --image-base 0x100000 --static -o kernel.elf main.o
+```
+
+```sh
+$ cd day03c
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+でた。
+
+![kernel.elfで描画](img/2021-05-08-20-33-00.png)
