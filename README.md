@@ -603,3 +603,21 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 でた。
 
 ![kernel.elfで描画](img/2021-05-08-20-33-00.png)
+
+## 2021/05/09 （9日目）
+
+今日は3.6節から。エラー処理の追加。
+
+```sh
+$ cd day03d
+$ source ../../osbook/devenv/buildenv.sh
+$ (cd kernel; make)
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+エラー処理の追加だけだから、変化なし。
+
+故意にエラーを出してみたいけど、
+
+
