@@ -626,6 +626,43 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 
 `.PHONY`を書いたことなかった。。。
 
+すでに`kernel`に`Makefile`を書いてたけど、書き直した。→ `day04a`
 
 
+`day04b` を編集して、
 
+```sh
+$ cd day04b
+$ source ../../osbook/devenv/buildenv.sh
+$ (cd kernel; make)
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+![緑の四角](img/2021-05-10-21-58-00.png)
+
+緑の四角が描けた。
+
+他の色で四角が描けるか試すために`kernel/main.cpp`に下記を追加した。
+
+```cpp
+    for (int x = 0; x < 100; ++x)
+    {
+        for (int y = 0; y < 100; ++y)
+        {
+            WritePixel(frame_buffer_config, 300 + x, 120 + y, {255, 0, 0});
+        }
+    }
+
+    for (int x = 0; x < 50; ++x)
+    {
+        for (int y = 0; y < 100; ++y)
+        {
+            WritePixel(frame_buffer_config, 450 + x, 240 + y, {0, 0, 255});
+        }
+    }
+```
+
+![赤と青の四角を追加](img/2021-05-10-22-04-00.png)
+
+うまく描けた。
