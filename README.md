@@ -666,3 +666,23 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 ![赤と青の四角を追加](img/2021-05-10-22-04-00.png)
 
 うまく描けた。
+
+## 2021/05/11 （11日目）
+
+今日は4.3節から。
+
+配置newのことを初めて知った。
+普段何気なく使っているヒープ領域はOSがあって初めて利用できる領域ということも知らなかった。
+確かにメモリ領域の確保や解放は、空き領域を探したり再利用できるようにする仕組みがないと使えない。なるほど。
+
+今日は`kernel/main.cpp`を編集した。
+
+```sh
+$ cd day04c
+$ source ../../osbook/devenv/buildenv.sh
+$ (cd kernel; make)
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+![classで実装](img/2021-05-11-22-01-00.png)
