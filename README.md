@@ -686,3 +686,52 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 ```
 
 ![classで実装](img/2021-05-11-22-01-00.png)
+
+## 2021/05/12 （12日目）
+
+今日は4.5節から。
+
+```sh
+$ readelf -l kernel.elf
+
+Elf file type is EXEC (Executable file)
+Entry point 0x101020
+There are 5 program headers, starting at offset 64
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  PHDR           0x0000000000000040 0x0000000000100040 0x0000000000100040
+                 0x0000000000000118 0x0000000000000118  R      0x8
+  LOAD           0x0000000000000000 0x0000000000100000 0x0000000000100000
+                 0x00000000000001a8 0x00000000000001a8  R      0x1000
+  LOAD           0x0000000000001000 0x0000000000101000 0x0000000000101000
+                 0x0000000000000259 0x0000000000000259  R E    0x1000
+  LOAD           0x0000000000002000 0x0000000000102000 0x0000000000102000
+                 0x0000000000000000 0x0000000000000018  RW     0x1000
+  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x0000000000000000 0x0000000000000000  RW     0x0
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .rodata 
+   02     .text 
+   03     .bss 
+   04     
+```
+
+`Main.c`で新しく追加した関数は、ヘッダファイルの中のアドレスを見て、使いたい領域のアドレスまでジャンプする処理になっている。
+データ構造の設計がうまくいっているからこのように実装できるんだろうけど、ちょっと考えないとついていけなくなる。
+
+```sh
+$ cd day04d
+$ source ../../osbook/devenv/buildenv.sh
+$ (cd kernel; make)
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+![カーネルファイルの読み込みを修正](img/2021-05-12-22-26-00.png)
+
+画面に代り映えがないけど、出た。
