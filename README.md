@@ -735,3 +735,32 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 ![カーネルファイルの読み込みを修正](img/2021-05-12-22-26-00.png)
 
 画面に代り映えがないけど、出た。
+
+## 2021/05/13 （13日目）
+
+今日は5.1節から。
+
+`A`を1度っとずつ描くのは楽しい。
+
+本と違って3つ出るようにした。
+
+```cpp
+    WriteAscii(*pixel_writer, 50, 50, 'A', {0, 0, 0});
+    WriteAscii(*pixel_writer, 58, 50, 'A', {0, 0, 0});
+    WriteAscii(*pixel_writer, 58, 66, 'A', {0, 0, 0});
+```
+
+```sh
+$ cd day05a
+$ source ../../osbook/devenv/buildenv.sh
+$ (cd kernel; make)
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+
+![Aを描画](img/2021-05-13-22-46-00.png)
+
+`A`がでた！
+
+
