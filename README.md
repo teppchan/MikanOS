@@ -764,3 +764,22 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 `A`がでた！
 
 
+## 2021/05/14 （14日目）
+
+今日は5.2節から。
+
+分割コンパイルできるように`main.cpp`の一部を`font.cpp/hpp`と`graphics.cpp/hpp`に分割した。
+`.gitignore`も追加した。`mikanos`のリポジトリでは`kernel`の中に置いていたけど、`./bat.sh`で作られる`disk.img`も除外できるように、一つ上のディレクトリに置いて除外候補に追加した。
+
+```sh
+$ cd day05b
+$ source ../../osbook/devenv/buildenv.sh
+$ (cd kernel; make)
+$ ./bat.sh
+$ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf
+```
+
+ソースコードを分割しただけなので、昨日と同じ結果だけど、出た。
+
+![昨日と同じ結果](img/2021-05-15-00-38-00.png)
+

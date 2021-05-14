@@ -1,0 +1,5 @@
+kernel.elf
+*.o
+.*.d
+disk.img
+mnt/
