@@ -783,3 +783,50 @@ $ ../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/
 
 ![昨日と同じ結果](img/2021-05-15-00-38-00.png)
 
+次は5.3節。
+
+フォントデータは下記のところから取ってきたもののようだ。
+
+http://openlab.ring.gr.jp/efont/dist/shinonome/shinonome-0.9.11-src.tar.bz2
+
+`hankaku/font_src.bit` が元データのようだけど、並び替えとか前処理が必要そう。
+今回はmikanosのリポジトリにおいてある処理済みの`kernel/henkaku.txt`を使う。
+
+```Makefile
+hankaku.bin: hankaku.txt
+	../tools/makefont.py -o $@ $<
+
+hankaku.o: hankaku.bin
+	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
+```
+
+この操作でできた`henkaku.o`を`objdump`で見てみた。
+
+```sh
+$ objdump -t hankaku.o
+
+hankaku.o:     file format elf64-x86-64
+
+SYMBOL TABLE:
+0000000000000000 l    d  .data  0000000000000000 .data
+0000000000000000 g       .data  0000000000000000 _binary_hankaku_bin_start
+0000000000001000 g       .data  0000000000000000 _binary_hankaku_bin_end
+0000000000001000 g       *ABS*  0000000000000000 _binary_hankaku_bin_size
+```
+
+`objcopy`で上のようなシンボルテーブルが作られたようだ。
+
+Pythonスクリプト`tools/makefont.py`は、`henkaku.txt`内の`.`と`@`がある行を見つけ、それをそのまま1バイトの数字に置き換える処理をしていた。
+256文字で1文字あたり16バイトなので、フォントデータは全部で256*16=4096=0x1000バイト。
+
+`kernel/font.cpp`の`GetFont()`では、文字コードに16を掛けて`index`を求め、`_binary_hankaku_bin_start`からのオフセットとして計算し、フォントデータのアドレスを求める。
+
+なるほど。
+
+シンボルテーブルを作ってリンクしてしまえば、バイナリデータを直接使えるようになるってことか。
+バイナリファイルを`xxd -i`でヘッダファイルに変換して使ったことがあったけど。このやり方でもたぶん行ける。
+後者のやり方だと、ファイルが大きくなってしまうけど。
+
+![フォントが増えた](img/2021-05-15-02-04-00.png)
+
+出た。
