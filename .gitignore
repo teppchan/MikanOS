@@ -3,3 +3,4 @@ kernel.elf
 .*.d
 disk.img
 mnt/
+mikanos/
