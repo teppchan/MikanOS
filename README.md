@@ -983,3 +983,34 @@ Linuxに先達が調べて実装した成果が残ってたからいいけど（
 
 
 明日から7章に取り掛かる。
+
+## 2021/05/21 （21日目）
+
+今日から7章。
+
+x86-64での割り込みはちょっと書くことが多くて複雑そう。
+たまに使ってるArduinoだと、下記のように[`attachInterrupt()`で関数を登録する](https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/)だけだった。
+
+```cpp
+const byte ledPin = 13;
+const byte interruptPin = 2;
+volatile byte state = LOW;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(interruptPin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(interruptPin), blink, CHANGE);
+}
+
+void loop() {
+  digitalWrite(ledPin, state);
+}
+
+void blink() {
+  state = !state;
+}
+```
+
+使っているマイコンで割り込みを設定するのにはもう少し手続きが必要っぽいけど、Arduinoのライブラリを使っていれば結構簡単に使える。
+ハードウェアの制約に気を付ける必要はあるけど。
+
