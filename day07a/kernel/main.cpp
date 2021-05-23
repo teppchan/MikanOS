@@ -125,7 +125,8 @@ extern "C" void KernelMain(const FrameBufferConfig &frame_buffer_config)
 
     console = new (console_buf) Console(*pixel_writer, kDesktopFGColor, kDesktopBGColor);
     printk("Welcome to MikanOS!\n");
-    SetLogLevel(kWarn);
+    //SetLogLevel(kWarn);
+    SetLogLevel(kInfo);
 
     mouse_cursor = new (mouse_cursor_buf) MouseCursor{
         pixel_writer, kDesktopBGColor, {300, 200}};
@@ -162,7 +163,7 @@ extern "C" void KernelMain(const FrameBufferConfig &frame_buffer_config)
     }
 
     if (xhc_dev)
-    {
+みつかった
         Log(kInfo, "xHC has been found: %d.%d.%d\n",
             xhc_dev->bus, xhc_dev->device, xhc_dev->function);
     }

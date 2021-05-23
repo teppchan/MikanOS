@@ -1,5 +1,6 @@
 #include "pci.hpp"
 #include "asmfunc.h"
+#include "logger.hpp"
 
 namespace
 {
@@ -303,6 +304,7 @@ namespace pci
                        unsigned int num_vector_exponent)
     {
         uint8_t cap_addr = ReadConfReg(dev, 0x34) & 0xffu;
+        Log(kInfo, "cap_addr 0x%x\n", cap_addr);
         uint8_t msi_cap_addr = 0;
         uint8_t msix_cap_addr = 0;
         while (cap_addr != 0)
@@ -310,13 +312,16 @@ namespace pci
             auto header = ReadCapabilityHeader(dev, cap_addr);
             if (header.bits.cap_id == kCapabilityMSI)
             {
+                Log(kInfo, "Found CapabilityMSI 0x%x\n", cap_addr);
                 msi_cap_addr = cap_addr;
             }
             else if (header.bits.cap_id == kCapabilityMSIX)
             {
+                Log(kInfo, "Found CapabilityMSIX 0x%x\n", cap_addr);
                 msix_cap_addr = cap_addr;
-            }
+       }
             cap_addr = header.bits.next_ptr;
+            Log(kInfo, "cap_addr 0x%x\n", cap_addr);
         }
 
         if (msi_cap_addr)

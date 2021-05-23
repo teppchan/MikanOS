@@ -1026,3 +1026,54 @@ void blink() {
 
 MSIに関して本文であまり解説がなかったけど、コード量はかなりあった。
 基本的な仕様は書いてあるので、読み解けそう。
+
+
+## 2021/05/23 （23日目）
+
+7.5節を復習。
+
+PCIデバイスのIRQ設定で苦労してたことがよみがえってきた。
+
+ディップスイッチでどの割り込みにするかを決める必要があった。
+初めてSCSIのHDDを買って、拡張ボードを組み込むとき何をどう決めればいいのか分からず戸惑った記憶がある。
+
+確かにある時期からこの設定をしなくてよくなった。あまりその辺の事情を知らずに使っていたんだなあ。
+
+2000年ごろに買って本棚に入れっぱなしにしてたPCIデバイス設計関連の書籍があって、
+ちょっと眺めてみたら確かにINT A#～D#の4本の割り込み信号を共有することが書いてあった。
+
+さて。
+
+`CapabilityHeader()`とか`MSICapability()`とかが分からな過ぎてつらい。
+
+`ReadCapabilityHeader()`の使い方を追ってみると、PCIコンフィグレーション空間の(p.142 図6.3)0x34の下位8bitを見ていた。
+
+```cpp
+    Error ConfigureMSI(const Device &dev,
+                       uint32_t msg_addr,
+                       uint32_t msg_data,
+                       unsigned int num_vector_exponent)
+    {
+        uint8_t cap_addr = ReadConfReg(dev, 0x34) & 0xffu;
+        uint8_t msi_cap_addr = 0;
+        uint8_t msix_cap_addr = 0;
+        while (cap_addr != 0)
+        {
+            auto header = ReadCapabilityHeader(dev, cap_addr)
+```
+
+
+`Capabilities Pointer`なるものが格納されていた。
+ここに格納されている8bitのアドレスを使って、さらにPCIコンフィグレーション空間を探索していた。
+
+処理途中をダンプしてみた。
+
+![cap_addrをダンプ](img/2021-05-23-18-54-00.png)
+
+`next_ptr`を順にたどって、
+0x90にCapabilityMSIXが、
+0x70にCapabilityMSIがみつかった。
+
+その見つかったアドレスを使って、`ConfigureMSIRegister()`で、
+p.169で説明されたMessage AddressレジスタとMessage Dataレジスタを設定する、と。
+
