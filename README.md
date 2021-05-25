@@ -1097,3 +1097,23 @@ Queueに保存するのは、何で割り込みが入ったか、という情報
 少なくとも`__asm__("cli")`と`__asm__("sti")`との間の割り込み禁止期間の外側なので、
 マウスカーソルの描画処理の最中に追加で割り込みが来ても、無視されることはない。
 
+
+## 2021/05/25 （25日目）
+
+今日から8章。メモリ管理を実装する章。
+
+![Kernelからメモリマップを表示](img/2021-05-25-22-37-00.png)
+
+とりあえずでた。
+
+4日目に出したメモリマップの一部を抜き出したものになっていた。
+
+```cpp
+    const std::array available_memory_types{
+        MemoryType::kEfiBootServicesCode,
+        MemoryType::kEfiBootServicesData,
+        MemoryType::kEfiConventionalMemory,
+    };
+```
+で定義したタイプだけ出すようにしてあった。Kernelで空き容量として使えるメモリ領域のようだ。
+次の節で説明するっぽい。
