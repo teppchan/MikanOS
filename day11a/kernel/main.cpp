@@ -23,6 +23,7 @@
 #include "memory_manager.hpp"
 #include "window.hpp"
 #include "layer.hpp"
+#include "message.hpp"
 
 int printk(const char *format, ...)
 {
@@ -66,19 +67,27 @@ extern "C" void KernelMainNewStack(
 {
     MemoryMap memory_map{memory_map_ref};
 
+    //printk("InitializeGraphics\n");
     InitializeGraphics(frame_buffer_config_ref);
+    //printk("InitializeConsole\n");
     InitializeConsole();
 
     printk("Welcome to MikanOS!\n");
-    //SetLogLevel(kWarn);
-    SetLogLevel(kDebug);
+    SetLogLevel(kWarn);
+    //SetLogLevel(kDebug);
 
+    printk("InitializeSegmentation\n");
     InitializeSegmentation();
+    printk("InitializePaging\n");
     InitializePaging();
+    printk("InitializeManger\n");
     InitializeMemoryManager(memory_map);
+    printk("std::deque");
     ::main_queue = new std::deque<Message>(32);
+    printk("InitializeIinterrupt\n");
     InitializeInterrupt(main_queue);
 
+    printk("InitializePCI\n");
     InitializePCI();
     usb::xhci::Initialize();
 
