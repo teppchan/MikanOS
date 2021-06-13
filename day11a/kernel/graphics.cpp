@@ -83,7 +83,7 @@ Vector2D<int> ScreenSize()
 
 namespace
 {
-    char pixel_writer_buf[sizeof(BGRResv8BitPerColorPixelWriter)];
+    char pixel_writer_buf[sizeof(RGBResv8BitPerColorPixelWriter)];
 }
 
 void InitializeGraphics(const FrameBufferConfig &screen_config)

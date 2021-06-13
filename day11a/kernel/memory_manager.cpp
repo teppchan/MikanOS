@@ -22,6 +22,7 @@ WithError<FrameID> BitmapMemoryManager::Allocate(size_t num_frames)
                 break;
             }
         }
+
         if (i == num_frames)
         {
             MarkAllocated(FrameID{start_frame_id}, num_frames);
@@ -105,17 +106,18 @@ namespace
 void InitializeMemoryManager(const MemoryMap &memory_map)
 {
     ::memory_manager = new (memory_manager_buf) BitmapMemoryManager;
-    Log(kError, "inside InitializeMemroyManager\n");
 
     const auto memory_map_base = reinterpret_cast<uintptr_t>(memory_map.buffer);
-    Log(kError, "memory_map.buffer %x\n", memory_map.buffer);
+    {
+        auto desc = reinterpret_cast<const MemoryDescriptor *>(memory_map_base);
+    }
     uintptr_t available_end = 0;
     for (uintptr_t iter = memory_map_base;
          iter < memory_map_base + memory_map.map_size;
          iter += memory_map.descriptor_size)
     {
-        Log(kError, "iter %p\n", iter);
         auto desc = reinterpret_cast<const MemoryDescriptor *>(iter);
+
         if (available_end < desc->physical_start)
         {
             memory_manager->MarkAllocated(
@@ -134,14 +136,14 @@ void InitializeMemoryManager(const MemoryMap &memory_map)
                 FrameID{desc->physical_start / kBytesPerFrame},
                 desc->number_of_pages * kUEFIPageSize / kBytesPerFrame);
         }
+    }
 
-        memory_manager->SetMemoryRange(FrameID{1}, FrameID{available_end / kBytesPerFrame});
+    memory_manager->SetMemoryRange(FrameID{1}, FrameID{available_end / kBytesPerFrame});
 
-        if (auto err = InitializeHeap(*memory_manager))
-        {
-            Log(kError, "failed to allocate pages: %s at %s:%d\n",
-                err.Name(), err.File(), err.Line());
-            exit(1);
-        }
+    if (auto err = InitializeHeap(*memory_manager))
+    {
+        Log(kError, "failed to allocate pages: %s at %s:%d\n",
+            err.Name(), err.File(), err.Line());
+        exit(1);
     }
 }
