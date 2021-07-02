@@ -86,7 +86,7 @@ void DrawTextCursor(bool visible)
 {
     const auto color = visible ? ToColor(0) : ToColor(0xffffff);
     const auto pos = Vector2D<int>{4 + 8 * text_window_index, 5};
-    FillRectangle(*text_window->Writer(), pos, {7, 15}, color);
+    FillRectangle(*text_window->InnerWriter(), pos, {7, 15}, color);
 }
 
 void InputTextWindow(char c)
@@ -122,7 +122,8 @@ std::shared_ptr<ToplevelWindow> task_b_window;
 unsigned int task_b_window_layer_id;
 void InitializeTaskBWindow()
 {
-    task_b_window = std::make_shared<ToplevelWindow>(160, 52, screen_config.pixel_format, "TaskB Window");
+    task_b_window = std::make_shared<ToplevelWindow>(160, 52,
+                                                     screen_config.pixel_format, "TaskB Window");
 
     task_b_window_layer_id = layer_manager->NewLayer()
                                  .SetWindow(task_b_window)
