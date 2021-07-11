@@ -1939,3 +1939,13 @@ BPBの構造。バイナリデータから意味ある情報を抜き出しな�
 とりあえず写経した。
 
 FATの構成をもうちょっと知りたいので明日少し見直そう。
+
+
+## 2021/07/11 （72日目）
+
+[FATの仕様書](https://download.microsoft.com%2Fdownload%2F1%2F6%2F1%2F161ba512-40e2-4cc9-843a-923143f3456c%2Ffatgen103.doc&usg=AOvVaw2NwPT7yLI0sIcY1mEmzrbe)を見てみた。
+
+全部読むのはしんどいので、`FAT Long Directry Entries`を少しだけ眺めてみた。
+
+FATの仕様は昔のMS DOSとの互換性も考慮して定義されていた。
+当時のツールで書き換えたときにおかしくならないように、Long Nameは特別なAttributeで定義されているようだ。
