@@ -1,0 +1,5 @@
+[Defines]
+  DEC_SPECIFICATION   = 0x00010005
+  PACKAGE_NAME        = MikanLoaderPkg
+  PACKAGE_GUID        = dbe19b51-65ba-4b01-a8cd-b194af164088
+  PACKAGE_VERSION     = 0.1
