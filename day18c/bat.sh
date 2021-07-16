@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+(cd kernel; make -j8)
+
+for MK in $(ls apps/*/Makefile); do
+    APP_DIR=$(dirname $MK)
+    APP=$(basename $APP_DIR)
+    make -C $APP_DIR $APP
+done
+
+pushd ../../edk2
+rm MikanLoaderPkg  # remove symbolic link
+ln -s ../MikanOS/day18c/MikanLoaderPkg
+source edksetup.sh
+#\rm -r Build
+build
+
+popd
+
+#../../osbook/devenv/run_qemu.sh ../../edk2/Build/MikanLoaderX64/DEBUG_CLANG38/X64/Loader.efi kernel/kernel.elf apps/onlyhlt/onlyhlt
+MIKANOS_DIR=$PWD ../../osbook/devenv/run_mikanos.sh
