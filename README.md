@@ -2049,3 +2049,21 @@ QEMUの設定が原因だったけ？
 ## 2021/07/21 （81日目）
 
 20.1節と20.2節を読んだ。
+
+
+## 2021/07/22 （82日目）
+
+20.1節のコードを写経した。
+
+アドレスは自分の環境でも確認した。
+
+```sh
+$ nm -C kernel.elf |grep printk
+000000000010b000 T printk(char const*, ...)
+$ nm -C kernel.elf |grep FillRectangle
+000000000010c1c0 T FillRectangle(PixelWriter&, Vector2D<int> const&, Vector2D<int> const&, PixelColor const&)
+$ nm -C kernel.elf |grep screen_writer
+000000000024d078 B screen_writer
+```
+
+![直接アドレスをたたいて、テキスト表示と矩形描画ができた](img/2021-07-22-20-09-00.png)
