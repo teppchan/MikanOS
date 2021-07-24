@@ -2079,3 +2079,51 @@ $ nm -C kernel.elf |grep screen_writer
 ## 2021/07/23 （83日目）
 
 20.3節を読んだ。
+
+
+## 2021/07/24 （84日目）
+
+20.3節を写した。
+
+`gdb`がインストールされてなかったので導入した。
+
+```sh
+$ sudo apt install gdb
+```
+
+`osbook/devenv/run_image.sh`で`QEMU`を起動するオプションを`$QEMU_OPTS`から変えられたので、下記のようにして`QEMU`を起動した。
+
+```sh
+$ QEMU_OPTS="-gdb tcp::12345 -S" ./bat.sh
+```
+`-S`がついてるから、`gdb`から`continue`するまで停止する。
+
+`gdb`を起動して、上で設定したポートに接続する。
+
+```sh
+$ cd day20c/kernel
+$ gdb
+(gdb) target remote localhost:12345
+Remote debugging using localhost:12345
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x000000000000fff0 in ?? ()
+(gdb) symbol-file kernel.elf
+Reading symbols from kernel.elf...done.
+(gdb) b IntHandlerLAPICTimer
+Breakpoint 1 at 0x10e90c
+(gdb) c
+Continuing.
+```
+
+`QEMU`が動きだして、ブレイクポイントで止まった。
+
+```sh
+Breakpoint 1, 0x000000000010e90c in IntHandlerLAPICTimer ()
+(gdb) p $rsp
+$1 = (void *) 0xfeada8
+```
+
+本とアドレス値が違っていたけど、メモリアドレスの最大値らへんになってないからうまくいってそう。
+
+![](img/2021-07-24-22-45-00.png)
