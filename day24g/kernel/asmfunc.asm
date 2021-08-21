@@ -131,40 +131,6 @@ SwitchContext:   ; void SwitchContext(void* next_ctx, void* current_ctx);
 
     fxsave [rsi + 0xc0]
 
-    push qword [rdi + 0x28] ; SS
-    push qword [rdi + 0x70] ; RSP
-    push qword [rdi + 0x10] ; RFLAGS
-    push qword [rdi + 0x20] ; CS
-    push qword [rdi + 0x08] ; RIP
-
-    fxrstor [rdi + 0xc0]
-
-    mov rax, [rdi + 0x00]
-    mov cr3, rax
-    mov rax, [rdi + 0x30]
-    mov fs, ax
-    mov rax, [rdi + 0x38]
-    mov gs, ax
-
-    mov rax, [rdi + 0x40]
-    mov rbx, [rdi + 0x48]
-    mov rcx, [rdi + 0x50]
-    mov rdx, [rdi + 0x58]
-    mov rsi, [rdi + 0x68]
-    mov rbp, [rdi + 0x78]
-    mov r8,  [rdi + 0x80]
-    mov r9,  [rdi + 0x88]
-    mov r10, [rdi + 0x90]
-    mov r11, [rdi + 0x98]
-    mov r12, [rdi + 0xa0]
-    mov r13, [rdi + 0xa8]
-    mov r14, [rdi + 0xb0]
-    mov r15, [rdi + 0xb8]
-
-    mov rdi, [rdi + 0x60]
-
-    o64 iret
-
 global RestoreContext
 RestoreContext: ; void RestoreContext(void *task_context);
     push qword [rdi + 0x28] ; SS
@@ -309,6 +275,7 @@ SyscallEntry: ; void SyscallEntry(void);
     mov rcx, r10
     and eax, 0x7fffffff
     mov rbp, rsp
+
     and rsp, 0xfffffffffffffff0
     push rax
     push rdx
@@ -346,8 +313,8 @@ SyscallEntry: ; void SyscallEntry(void);
 
 global ExitApp  ; void ExitApp(uint64_t rsp, int32_t ret_val);
 ExitApp:
-    mov rsp, rax
-    mov eax, edx
+    mov rsp, rdi
+    mov eax, esi
 
     pop r15
     pop r14
