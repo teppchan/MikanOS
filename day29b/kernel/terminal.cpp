@@ -683,7 +683,7 @@ WithError<int> Terminal::ExecuteFile(fat::DirectoryEntry &file_entry, char *comm
 
     for (int i = 0; i < files_.size(); ++i)
     {
-        task.Files().push_back(files_[1]);
+        task.Files().push_back(files_[i]);
     }
 
     const uint64_t elf_next_page =

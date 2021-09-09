@@ -78,10 +78,9 @@ namespace fat
     {
         uint32_t next = GetFAT()[cluster];
         if (IsEndOfClusterchain(next))
-            if (next >= 0x0fffffff8ul)
-            {
-                return kEndOfClusterchain;
-            }
+        {
+            return kEndOfClusterchain;
+        }
         return next;
     }
 
